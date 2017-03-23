@@ -11,8 +11,8 @@
 现在的样子也才只是我想象中的轮廓，代码也不够好看，继续完善，就这样
 
   [1]: http://weibo.com/ghosert
-  [2]: https://github.com/sakurasan/ONE/tree/master/static/img/20170321085646.png
+  [2]: https://github.com/sakurasan/ONE/blob/master/static/img/20170321085646.png
   [3]: http://codebeta.cn/one
-  [4]: https://github.com/sakurasan/ONE/tree/master/static/img/20170321085737.png
-  [5]: https://github.com/sakurasan/ONE/tree/master/static/img/20170321085559.png
-  [6]: https://github.com/sakurasan/ONE/tree/master/static/img/20170321085646.png
+  [4]: https://github.com/sakurasan/ONE/blob/master/static/img/20170321085737.png
+  [5]: https://github.com/sakurasan/ONE/blob/master/static/img/20170321085559.png
+  [6]: https://github.com/sakurasan/ONE/blob/master/static/img/20170321085646.png
