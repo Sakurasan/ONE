@@ -16,4 +16,6 @@
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
 
-*.go linguist-language=Scala
+*.js linguist-language=Go
+*.css linguist-language=Go
+*.html linguist-language=Go
