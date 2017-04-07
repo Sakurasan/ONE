@@ -1,9 +1,12 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"ONE/models"
+	"github.com/astaxie/beego"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
 )
 
 type ATopicController struct {
@@ -130,4 +133,40 @@ func (this *ATopicController) Delete() {
 	}
 	this.Redirect("/topic", 302)
 	return
+}
+
+// 接收文件
+func (this *ATopicController) Upload() {
+	// 获取本月日期
+	now := time.Now().Format("2006/01")
+	// 设置保存目录
+	mpath := "/upload/image/" + now + "/"
+	// 创建目录
+	os.MkdirAll(mpath, 0755)
+
+	_, h, err := this.GetFile("editormd-image-file")
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"success": 0, "message": err.Error()}
+		this.ServeJSON()
+	}
+
+	fpath := mpath + h.Filename
+
+	for i := 0; ; i++ {
+		_, err = os.Stat(fpath)
+		if err == nil {
+			fpath = mpath + strconv.Itoa(i) + h.Filename
+		} else {
+			break
+		}
+	}
+
+	err = this.SaveToFile("editormd-image-file", fpath)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"success": 0, "message": err.Error()}
+	} else {
+		this.Data["json"] = map[string]interface{}{"success": 1, "message": "文件上传成功！", "url": fpath[1:]}
+	}
+
+	this.ServeJSON()
 }

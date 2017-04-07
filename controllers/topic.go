@@ -3,10 +3,12 @@ package controllers
 import (
 	"ONE/models"
 
-	//"strconv"
 	"net/http"
 
 	"github.com/astaxie/beego"
+	"os"
+	"strconv"
+	"time"
 )
 
 type TopicController struct {
@@ -95,6 +97,7 @@ func (this *TopicController) View() {
 
 	this.Data["Replies"] = replies
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	this.Data["IsLogin2"] = checkAccount(this.Ctx)
 
 }
 
@@ -133,4 +136,40 @@ func (this *TopicController) Delete() {
 	}
 	this.Redirect("/topic", 302)
 	return
+}
+
+// 接收文件
+func (this *TopicController) Upload() {
+	// 获取本月日期
+	now := time.Now().Format("2006/01")
+	// 设置保存目录
+	mpath := "upload/image/" + now + "/"
+	// 创建目录
+	os.MkdirAll(mpath, 0755)
+
+	_, h, err := this.GetFile("editormd-image-file")
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"success": 0, "message": err.Error()}
+		this.ServeJSON()
+	}
+
+	fpath := mpath + h.Filename
+
+	for i := 0; ; i++ {
+		_, err = os.Stat(fpath)
+		if err == nil {
+			fpath = mpath + strconv.Itoa(i) + h.Filename
+		} else {
+			break
+		}
+	}
+
+	err = this.SaveToFile("editormd-image-file", fpath)
+	if err != nil {
+		this.Data["json"] = map[string]interface{}{"success": 0, "message": err.Error()}
+	} else {
+		this.Data["json"] = map[string]interface{}{"success": 1, "message": "文件上传成功！", "url": beego.AppConfig.String("url") + fpath[0:]}
+	}
+
+	this.ServeJSON()
 }

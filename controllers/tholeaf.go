@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"ONE/models"
+	"github.com/astaxie/beego"
 	"path"
 )
 
@@ -45,7 +45,7 @@ func (this *TholeafController) Post() {
 	if fh != nil {
 		image = fh.Filename
 		beego.Info(image)
-		err := this.SaveToFile("file", path.Join("static/upload/image", image))
+		err := this.SaveToFile("file", path.Join("upload/image", image))
 		if err != nil {
 			beego.Error(err)
 		}
@@ -55,4 +55,6 @@ func (this *TholeafController) Post() {
 	if err != nil {
 		beego.Error(err)
 	}
+
+	this.Redirect("/tholeaf", 302)
 }
