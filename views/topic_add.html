@@ -8,7 +8,7 @@
  -->
 </head>
 
-<body style="background-color: #fff;" class="post-template-default single single-post postid-21 single-format-standard" onload="testEditor.unwatch()">
+<body style="background-color: #fff;" class="post-template-default single single-post postid-21 single-format-standard" onload="Editor.unwatch()">
 <noscript>请启用您浏览器的 JavaScript 选项！</noscript>
 <header>
 {{template "header-bar" .}}       
@@ -17,7 +17,7 @@
 		<div class="container">
 
 			<h1>添加文章</h1>
-			<form method="post" action="/topic">
+			<form method="post" action="/topic" id="new-form">
 				<div class="form-group">
 					<label>文章标题：</label>
 					<input type="text" class="form-control" name="title" placeholder="（必填）" aria-required="true" required="">
@@ -49,11 +49,13 @@
 				</div> -->
                 
                 <label>文章内容：</label>
-                <div id="test-editormd" style="padding-top: 10px" class="form-group">
+                <div id="editor" style="padding-top: 10px" class="form-group">
 
                     <textarea name="content" class="form-control" style="display:none;" id="ts"></textarea>
+                    <textarea class="editormd-html-textarea" name="html"></textarea>
                     
                 </div>
+                <!-- <div id="editor"></div> -->
                 <!-- <textarea name="content" cols="30" rows="10" class="form-control" id="editormd">{{.Topic.Content}}</textarea> -->
             
                 
@@ -73,28 +75,58 @@
 		<!-- <script type="text/javascript" src="http://77fkk5.com1.z0.glb.clouddn.com/static/lib/editor.md-1.5.0/editormd.min.js"></script> -->
         <script type="text/javascript">
         //    调用编辑器
-        var testEditor;
-        $(function() {
-            testEditor = editormd("test-editormd", {
-                // width   : "1000px",
-                height  : 640,
-                emoji: true,
-                // markdown: markdown,
-                autoFocus: false,
-                //syncScrolling : "single",
-                //unwatch:true,
-                saveHTMLToTextarea : true,
-                placeholder: "Mardkown，提交前请查看预览格式是否正确",
-                path    : "../static/lib/",
-                  imageUpload: true,
-                  imageFormats: ["jpg", "jpeg", "gif", "png"],
-                  imageUploadURL: "/upload/image",
-                onchange: function() {
-                  $(test-editormd).attr('disabled', this.markdown().trim() == "");
-                }
-            });
-            return testEditor;
-        });
+        // var testEditor; 
+        // $(function() {
+        //     testEditor = editormd("test-editormd", {
+        //         // width   : "1000px",
+        //         height  : 640,
+        //         emoji: true,
+        //         // markdown: markdown,
+        //         autoFocus: false,
+        //         //syncScrolling : "single",
+        //         //unwatch:true,
+        //         saveHTMLToTextarea : true,
+        //         placeholder: "Mardkown，提交前请查看预览格式是否正确",
+        //         path    : "../static/lib/",
+        //         imageUpload: true,
+        //         imageFormats: ["jpg", "jpeg", "gif", "png"],
+        //         imageUploadURL: "/upload",
+        //         onchange: function() {
+        //           $(test-editormd).attr('disabled', this.markdown().trim() == "");
+        //         }
+        //     });
+        //     return testEditor;
+        // });
+
+        // var Editor;
+        // $(function(){
+        // Editor = editormd('editor',{
+                
+        //         // width: '100%',
+        //         height: 640,
+        //         emoji:true,
+        //         autoFocus:true,
+        //         saveHTMLToTextarea=true,
+        //         placeholder: "Mardkown，提交前请查看预览格式是否正确",
+        //         path: '../static/lib/',
+        //         toolbarIcons:function(){
+        //             return ['undo','redo','|','bold','del','italic','quote','|','h2','h3','h4','h5','h6','|','list-ul','list-ol','hr','|','link','image','code','code-block','table','datetime','html-entities','pagebreak','|','goto-line','watch','fullscreen','clear','search','|','help']
+        //         },
+        //         imageUpload : true,
+        //         imageUploadURL : '/upload',
+        //         htmlDecode : true,
+        //         codeFold: true,
+        //         toc: true,
+        //         tocStartLevel: 2
+        //     });
+
+        // $('#new-form').submit(function(){
+        //         $('input[name="html"]').val(Editor.getPreviewedHTML());
+        //         $('#new-form').submit();
+        //     });
+
+        // });
+
         </script>
 
 <!--         <script>
@@ -128,5 +160,61 @@
           }
         </script> -->
 
+        <script>
+        function clickOrTouch(touchType){
+            return this.mouseOrTouch("click", touchType);
+        }
+        function mouseOrTouch(mouseType, touchType) {
+            mouseType = mouseType || "click";
+            touchType = touchType || "touchend";
+            var eventType = mouseType;
+            try {
+                document.createEvent("TouchEvent");
+                eventType = touchType;
+            } 
+            catch(e) {} 
+            return eventType;
+        }
+        var Editor;
+        $(function(){
+            $("#open-menu").bind(clickOrTouch(), function() {
+                $("nav").toggleClass("xs-hide");
+            });
+            $(window).bind('scroll',function(){
+                var scrollTop = $(window).scrollTop();
+                if(scrollTop > 100)
+                    $('#go-top').show();
+                else
+                    $('#go-top').hide();
+            });
+            $('#go-top').click(function(){
+                $('html,body').animate({
+                    scrollTop: '0px'
+                }, 800);
+            });
+            Editor = editormd('editor',{
+                {{if .Markdown}}markdown: "{{.Markdown}}",{{end}}
+                width: '100%',
+                height: 640,
+                path: '../static/lib/',
+                placeholder: "Mardkown，提交前请查看预览格式是否正确",
+                saveHTMLToTextarea : true,
+                toolbarIcons:function(){
+                    return ['undo','redo','|','bold','del','italic','quote','|','h2','h3','h4','h5','h6','|','list-ul','list-ol','hr','|','link','image','code','code-block','table','datetime','html-entities','pagebreak','|','goto-line','watch','fullscreen','clear','search','|','help']
+                },
+                imageUpload : true,
+                imageUploadURL : 'upload',
+                htmlDecode : true,
+                codeFold: true,
+                toc: true,
+                tocStartLevel: 2
+            });
+            $('#new-form').submit(function(){
+                $('input[name="html"]').val(Editor.getHTML());
+                $('#new-form').submit();
+            });
+        });
+        </script>
+        <a href="javascript:;" class="fa fa-arrow-circle-up fa-2x" id="go-top" style="float: right;"></a>
 	</body>
 </html>

@@ -17,7 +17,7 @@
                     <h2 class="entry-title h3"><a href="/topic/view/{{.Id}}">{{.Title}}</a></h2>
                     <h6 class="text-muted">文章发表于{{.Created}}，共有 {{.Views}} 次浏览， {{.ReplyCount}} 个评论</h6>
                     <div>
-                        <h5>{{.Summary}}! ··· ···  (<a href="/topic/view/{{.Id}}"> 点击查看全文 )</a> </h5>
+                        <h5>{{.Summary}} (<a href="/topic/view/{{.Id}}"> 点击查看全文 )</a> </h5>
                     </div>
                 </div>
                 {{end}}
@@ -43,7 +43,9 @@
             <aside class="panel panel-default widget clearfix widget_tag_cloud" data-offset-top="2730" style="width: auto; position: static; top: 0px;">
                 <h4 class="panel-heading widget-title">标签</h4>
                 <div class="tagcloud">
-                <a href="" class="tag-link-50 tag-link-position-1" title="1个话题" style="font-size: 9pt;">Chrome插件</a>
+                {{range .Tags}}
+                <a href="" class="tag-link-50 tag-link-position-1" title="1个话题" style="font-size: 9pt;">{{.Name}}</a>
+                {{end}}
                 <a href="http://www.codebeta.cn/?tag=google" class="tag-link-51 tag-link-position-2" title="1个话题" style="font-size: 9pt;">Google</a>
 
             </aside>

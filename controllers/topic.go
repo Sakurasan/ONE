@@ -21,7 +21,7 @@ func (this *TopicController) Get() {
 	this.Data["IsTopic"] = true
 	this.TplName = "topic.html"
 
-	topics, err := models.GetAllTopics("", false, true)
+	topics, err := models.GetAllTopiclist()
 
 	if err != nil {
 		beego.Error(err)
@@ -42,13 +42,16 @@ func (this *TopicController) Post() {
 	title := this.Input().Get("title")
 	content := this.Input().Get("content")
 	// content := this.Request.FormValue("editormd-html-code")
+	markdown := this.GetString("markdown")
+	// html := this.GetString("html")
+	html := this.Input().Get("html")
 	category := this.Input().Get("category")
 	label := this.Input().Get("label")
 	summary := this.Input().Get("summary")
 
 	var err error
 	if len(tid) == 0 {
-		err = models.AddTopic(title, category, label, summary, content)
+		err = models.AddTopic(title, category, label, summary, content, markdown, html)
 	} else {
 		err = models.ModifyTopic(tid, title, category, summary, content, label)
 	}
@@ -69,6 +72,7 @@ func (this *TopicController) Add() {
 		return
 	}
 
+	//获取分类信息
 	categories, err := models.GetAllCategories()
 	if err != nil {
 		beego.Error(err)

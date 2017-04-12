@@ -43,7 +43,10 @@ type Topic struct {
 	Labels          string
 	Summary         string `orm:"size(1000)"`
 	Content         string `orm:"size(5000)"`
+	Tags            []*Tag `orm:"rel(m2m)"`
 	Image           string
+	Markdown        string
+	Html            string
 	Attachment      string
 	Created         time.Time `orm:"index"`
 	Updated         time.Time `orm:"index"`
@@ -53,6 +56,14 @@ type Topic struct {
 	ReplyCount      int64
 	ReplyLastUserId int64
 	Tflag           int
+	Type            string
+}
+
+//标签
+type Tag struct {
+	Id    int64
+	Name  string   `orm:"index"`
+	Topic []*Topic `orm:"reverse(many)"`
 }
 
 //评论
@@ -66,14 +77,9 @@ type Comment struct {
 }
 
 func RegisterDB() {
-	// 检查数据库文件 // sqlite数据库检查db文件
-	// if !com.IsExist(_DB_NAME){
-	// 	os.MkdirAll(path.Dir(_DB_NAME), os.ModePerm)
-	// 	os.Create(_DB_NAME)
-	// }
 
 	// 注册模型
-	orm.RegisterModel(new(Category), new(Topic), new(Comment))
+	orm.RegisterModel(new(Category), new(Topic), new(Comment), new(Tag))
 	// 注册驱动（“mysql”）
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	// 注册默认数据库
@@ -149,7 +155,7 @@ func AddTholeaf(summary, image string) error {
 }
 
 /***文章的 添加，获取所有文章，获取单篇文章内容，文章修改，文章删除***/
-func AddTopic(title, category, lable, summary, content string) error {
+func AddTopic(title, category, lable, summary, content, markdown, html string) error {
 	o := orm.NewOrm()
 
 	lable = "$" + strings.Join(strings.Split(lable, " "), "#$") + "#" // 切成切片，再用 $# 粘起来成字符
@@ -160,6 +166,8 @@ func AddTopic(title, category, lable, summary, content string) error {
 		Labels:    lable,
 		Summary:   summary,
 		Content:   content,
+		Markdown:  markdown,
+		Html:      html,
 		Created:   time.Now(),
 		Updated:   time.Now(),
 		ReplyTime: time.Now(),
@@ -199,13 +207,27 @@ func GetAllTopics(cate string, isDesc, isTflag bool) ([]*Topic, error) {
 			qs = qs.Filter("Tflag", 1)
 			_, err = qs.OrderBy("-created").All(&topics)
 		} else {
-			// qs = qs.Filter("Tflag", "")
+			qs = qs.Filter("Tflag", "")
 			_, err = qs.OrderBy("-created").All(&topics)
 		}
 
 	} else {
 		_, err = qs.All(&topics)
 	}
+	return topics, err
+
+}
+
+func GetAllTopiclist() ([]*Topic, error) {
+	o := orm.NewOrm()
+
+	topics := make([]*Topic, 0)
+
+	qs := o.QueryTable("topic")
+
+	qs = qs.Filter("Tflag", 0)
+	_, err := qs.OrderBy("-created").All(&topics)
+
 	return topics, err
 
 }
@@ -434,4 +456,18 @@ func DeleteReply(rid string) error {
 
 	return err
 
+}
+
+func GetAllTags() ([]*Tag, error) {
+	tags := make([]*Tag, 0)
+	o := orm.NewOrm()
+	qs := o.QueryTable("tag").Distinct()
+	_, err := qs.All(&tags)
+	return tags, err
+}
+
+func (t Tag) GetOrNewTag() *Tag {
+	o := orm.NewOrm()
+	_, _, _ = o.ReadOrCreate(&t, "Name")
+	return &t
 }

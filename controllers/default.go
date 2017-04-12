@@ -29,6 +29,12 @@ func (c *MainController) Get() {
 
 	c.Data["Categories"] = categories
 
+	tags, err := models.GetAllTags()
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Tags"] = tags
+
 	// 模板使用
 	// c.Data["Website"] = "golang.org"
 	// c.Data["Email"] = "astaxie@gmail.com"

@@ -25,6 +25,8 @@
     <script type='text/javascript' src='//dn-staticfile.qbox.me/jquery/1.11.1/jquery.min.js?ver=1.10.2'></script>
     <script type='text/javascript' src='//dn-staticfile.qbox.me/jquery-migrate/1.2.1/jquery-migrate.min.js?ver=1.2.1'></script>
 
+    
+
     <!-- <link rel="stylesheet" href="http://resource.wufazhuce.com/one3.0.css"> -->
     <link rel="stylesheet" href="/static/css/one3.0.css">
 

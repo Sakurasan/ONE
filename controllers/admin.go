@@ -10,4 +10,8 @@ type AdminController struct {
 
 func (this *AdminController) Get() {
 	this.TplName = "OneAdmin.html"
+	if !checkAccount(this.Ctx) {
+		this.Redirect("/login", 302)
+		return
+	}
 }

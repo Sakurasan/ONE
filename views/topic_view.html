@@ -3,6 +3,8 @@
     	<title>{{.Topic.Title}} - 「一个·轻博客」</title>
         <link rel="stylesheet" type="text/css" href="/static/css/editormd.min.css">
         <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/static/css/one3.0.css">
+
 
 </head>
 
@@ -13,18 +15,21 @@
 </header><!-- #masthead -->
 		
 		<div class="container">
-			{{with .Topic}}
-			<h2 class="articulo-titulo">{{.Title}} 
-			<span><small><a href="/topic/modify?tid={{.Id}}">编辑</a></small></span>
-			</h2>
-			<br>
+        <div class="one-articulo">
 
-			<!-- <div class="articulo-contenido">
-			<p>{{.Content}}</p>
-			</div> -->
+			<h2 class="articulo-titulo"> &nbsp;{{.Topic.Title}} 
+            {{if .IsLogin}}
+			<span><small><a href="/topic/modify?tid={{.Id}}">编辑</a></small></span>
+			{{end}}
+            </h2>
+            
+			<br>
+            <p class="articulo-autor">
+                &nbsp;&nbsp;&nbsp;&nbsp;作者/我是白
+            </p>
 
             <div id="test-editormd" class="articulo-contenido">
-                <textarea style="display:none;" id="ts">{{.Content}}</textarea>
+                <textarea style="display:none;" id="ts" class="articulo-contenido">{{.Topic.Content}}</textarea>
             </div>
 
             <!-- JiaThis Button BEGIN -->
@@ -39,10 +44,12 @@
                 <a class="jiathis_counter_style"></a>
                 <br>
             </div>
+
+            </div>
             <br>
             <br>
             <!-- JiaThis Button END -->
-			{{end}}
+            <!-- Topic结束 -->
 
             <br>
             <div class="panel panel-default" id="comments" data-no-instant="">

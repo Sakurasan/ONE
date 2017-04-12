@@ -40,13 +40,15 @@ func (this *ATopicController) Post() {
 	title := this.Input().Get("title")
 	content := this.Input().Get("content")
 	// content := this.Request.FormValue("editormd-html-code")
+	markdown := this.GetString("editor-markdown-doc")
+	html := this.GetString("html")
 	category := this.Input().Get("category")
 	label := this.Input().Get("label")
 	summary := this.Input().Get("summary")
 
 	var err error
 	if len(tid) == 0 {
-		err = models.AddTopic(title, category, label, summary, content)
+		err = models.AddTopic(title, category, label, summary, content, markdown, html)
 	} else {
 		err = models.ModifyTopic(tid, title, category, summary, content, label)
 	}

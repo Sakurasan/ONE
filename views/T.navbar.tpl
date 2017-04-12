@@ -42,9 +42,9 @@
 
 {{end}}
 
-<li>
+<!-- <li>
 <a href="http://www.codebeta.cn/?p=31" title="历史" itemprop="url">
 <i class="_mi _before dashicons dashicons-info" aria-hidden="true"></i>
 <span>关于本站</span>
 </a>
-</li>
+</li> -->

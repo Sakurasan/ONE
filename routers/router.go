@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"github.com/astaxie/beego"
 	"ONE/controllers"
+	"github.com/astaxie/beego"
 )
 
 func init() {
@@ -20,4 +20,5 @@ func init() {
 	beego.Router("/admin", &controllers.AdminController{})
 	beego.Router("/admin/acategory", &controllers.ACatController{})
 	beego.Router("/admin/atopic", &controllers.ATopicController{})
+	beego.Router("/upload", &controllers.TopicController{}, "post:Upload")
 }
