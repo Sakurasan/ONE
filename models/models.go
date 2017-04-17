@@ -155,15 +155,22 @@ func AddTholeaf(summary, image string) error {
 }
 
 /***文章的 添加，获取所有文章，获取单篇文章内容，文章修改，文章删除***/
-func AddTopic(title, category, lable, summary, content, markdown, html string) error {
+func AddTopic(title, category, label, summary, content, markdown, html string) error {
 	o := orm.NewOrm()
 
-	lable = "$" + strings.Join(strings.Split(lable, " "), "#$") + "#" // 切成切片，再用 $# 粘起来成字符
+	strs := strings.Split(label, " ")
+	tags := []*Tag{}
+	for _, v := range strs {
+		tags = append(tags, Tag{Name: strings.TrimSpace(v)}.GetOrNewTag())
+	}
+
+	label = "$" + strings.Join(strings.Split(label, " "), "#$") + "#" // 切成切片，再用 $# 粘起来成字符
 
 	topic := &Topic{
 		Title:     title,
 		Category:  category,
-		Labels:    lable,
+		Labels:    label,
+		Tags:      tags,
 		Summary:   summary,
 		Content:   content,
 		Markdown:  markdown,
@@ -177,6 +184,10 @@ func AddTopic(title, category, lable, summary, content, markdown, html string) e
 	if err != nil {
 		return err
 	}
+
+	m2m := o.QueryM2M(topic, "Tags") //更新文章标签对应关系
+	m2m.Clear()
+	m2m.Add(topic.Tags)
 
 	//更新分类列表
 	cate := new(Category)
@@ -214,6 +225,7 @@ func GetAllTopics(cate string, isDesc, isTflag bool) ([]*Topic, error) {
 	} else {
 		_, err = qs.All(&topics)
 	}
+
 	return topics, err
 
 }
@@ -251,33 +263,45 @@ func GetTopic(tid string) (*Topic, error) {
 	topic.Views++
 	_, err = o.Update(topic)
 
-	topic.Labels = strings.Replace(strings.Replace(
-		topic.Labels, "#", " ", -1), "$", "", -1)
+	topic.Labels = strings.Replace(
+		strings.Replace(topic.Labels, "#", " ", -1), "$", "", -1)
 
 	return topic, nil
 }
 
 func ModifyTopic(tid, title, category, summary, content, label string) error {
-
-	label = "$" + strings.Join(strings.Split(label, " "), "#$") + "#" // 切成切片，再用 $# 粘起来成字符
+	o := orm.NewOrm()
 	tidNum, err := strconv.ParseInt(tid, 10, 64)
 	if err != nil {
 		return err
 	}
+	a := &Topic{Id: tidNum}
+	old := Topic{Id: tidNum}
+	_, _ = o.LoadRelated(&old, "Tags")
+
+	strs := strings.Split(label, " ")                                 //以空格切割，切成slice
+	label = "$" + strings.Join(strings.Split(label, " "), "#$") + "#" // 切成切片，再用 $# 粘起来成字符
+
+	tags := []*Tag{}
+	for _, v := range strs {
+		tags = append(tags, Tag{Name: strings.TrimSpace(v)}.GetOrNewTag())
+	}
+
+	//分类
 	var oldCate string
-	o := orm.NewOrm()
 
 	topic := &Topic{Id: tidNum}
 
 	err = o.Read(topic)
 	if err == nil {
 		//当查到，返回的 err为 nil
-		oldCate = topic.Category
+		oldCate = topic.Category //储存旧分类
 		topic.Title = title
 		topic.Category = category //新分类
 		topic.Summary = summary
 		topic.Content = content
 		topic.Labels = label
+		topic.Tags = tags
 		topic.Updated = time.Now()
 		_, err = o.Update(topic)
 		if err != nil {
@@ -302,6 +326,31 @@ func ModifyTopic(tid, title, category, summary, content, label string) error {
 	if err == nil {
 		cate.TopicCount++ //存在 加一
 		_, err = o.Update(cate)
+	}
+
+	a.Tags = tags
+	m2m := o.QueryM2M(topic, "Tags")
+
+	//标签插入
+VI:
+	for _, vi := range a.Tags {
+		for _, vj := range old.Tags {
+			if vi.Id == vj.Id {
+				continue VI
+			}
+		}
+		m2m.Add(vi)
+	}
+
+	//标签删除的
+VD:
+	for _, vi := range old.Tags {
+		for _, vj := range a.Tags {
+			if vi.Id == vj.Id {
+				continue VD
+			}
+		}
+		m2m.Remove(vi)
 	}
 
 	return nil
@@ -464,6 +513,18 @@ func GetAllTags() ([]*Tag, error) {
 	qs := o.QueryTable("tag").Distinct()
 	_, err := qs.All(&tags)
 	return tags, err
+}
+
+func Tag2topic(tag string) (topics []*Topic, err error) {
+	o := orm.NewOrm()
+	qs := o.QueryTable("topic")
+	topics = make([]*Topic, 0)
+	if len(tag) > 0 {
+		qs = qs.Filter("labels__contains", "$"+tag+"#")
+	}
+	_, err = qs.OrderBy("-created").All(&topics)
+	return topics, err
+
 }
 
 func (t Tag) GetOrNewTag() *Tag {

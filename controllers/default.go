@@ -18,14 +18,18 @@ func (c *MainController) Get() {
 	topics, err := models.GetAllTopics(c.Input().Get("cate"), true, false)
 	if err != nil {
 		beego.Error(err)
-	} else {
-		c.Data["Topics"] = topics
 	}
 
 	categories, err := models.GetAllCategories()
 	if err != nil {
 		beego.Error(err)
 	}
+
+	topics, err = models.Tag2topic(c.Input().Get("tag"))
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Topics"] = topics
 
 	c.Data["Categories"] = categories
 

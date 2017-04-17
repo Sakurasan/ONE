@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"ONE/models"
+	"github.com/astaxie/beego"
 )
 
 type CategoryController struct {
@@ -24,7 +24,7 @@ func (this *CategoryController) Get() {
 			beego.Error(err)
 		}
 
-		this.Redirect("category", 301)
+		this.Redirect("/category", 301)
 
 	case "del":
 		id := this.Input().Get("id")

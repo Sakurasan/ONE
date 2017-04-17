@@ -8,6 +8,7 @@ import (
 	"github.com/astaxie/beego"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -84,6 +85,7 @@ func (this *TopicController) View() {
 	this.TplName = "topic_view.html"
 
 	topic, err := models.GetTopic(this.Ctx.Input.Params()["0"])
+	// topic, err := models.GetTopic(this.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		this.Redirect("/", 302)
@@ -92,6 +94,7 @@ func (this *TopicController) View() {
 
 	this.Data["Topic"] = topic
 	this.Data["Tid"] = this.Ctx.Input.Params()["0"]
+	// this.Data["Tid"] = this.Ctx.Input.Param("0")
 
 	replies, err := models.GetAllReplies(this.Ctx.Input.Params()["0"])
 	if err != nil {
@@ -102,6 +105,7 @@ func (this *TopicController) View() {
 	this.Data["Replies"] = replies
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	this.Data["IsLogin2"] = checkAccount(this.Ctx)
+	this.Data["tags"] = strings.Split(topic.Labels, " ")
 
 }
 
