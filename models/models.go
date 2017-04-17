@@ -520,7 +520,7 @@ func Tag2topic(tag string) (topics []*Topic, err error) {
 	qs := o.QueryTable("topic")
 	topics = make([]*Topic, 0)
 	if len(tag) > 0 {
-		qs = qs.Filter("labels__contains", "$"+tag+"#")
+		qs = qs.Filter("labels__contains", "$"+tag+"#") //用到beego orm高级查询 包含
 	}
 	_, err = qs.OrderBy("-created").All(&topics)
 	return topics, err
