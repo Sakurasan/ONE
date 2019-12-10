@@ -20,7 +20,7 @@ const (
 	// 设置数据库名称
 	_MYSQL_DRIVER = "mysql"
 
-	cnn = "root:oneisall@/demo?charset=utf8&loc=Asia%2FShanghai"
+	cnn = "testdb:testdb@tcp(localhost:3306)/testdb?charset=utf8&loc=Asia%2FShanghai"
 )
 
 // 分类

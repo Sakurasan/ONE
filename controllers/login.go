@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"fmt"
 )
 
 type LoginController struct {
@@ -61,6 +62,7 @@ func checkAccount(ctx *context.Context) bool {
 	}
 
 	pwd := ck.Value
+	fmt.Println(uname,pwd)
 	return uname == beego.AppConfig.String("uname") &&
 		pwd == beego.AppConfig.String("pwd")
 }
