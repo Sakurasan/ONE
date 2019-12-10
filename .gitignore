@@ -76,3 +76,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+*.exe*
+*.log
+upload/image/
